@@ -1,0 +1,55 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_questionnaire/question_starrating
+    
+    Star Rating question display template.
+    
+    Context variables required for this template:
+    * question - The question object
+    * qelements - Question elements including rows and maxstars
+}}
+<div class="qn-container star-rating-question" id="starrating_{{question.id}}">
+    <fieldset class="star-rating-fieldset">
+        <legend class="sr-only">{{qelements.caption}}</legend>
+        
+        {{#qelements.rows}}
+        <div class="star-rating-row" data-question-id="{{question.id}}" data-choice-id="{{choiceid}}">
+            <div class="star-rating-label">
+                {{{content}}}
+                {{#question.required}}
+                <span class="required-label">*</span>
+                {{/question.required}}
+            </div>
+            <div class="star-rating-stars">
+                <input type="hidden" name="{{name}}" value="{{value}}" class="star-rating-value">
+                {{#stars}}
+                <span class="star {{#selected}}star-selected{{/selected}}" 
+                      data-value="{{value}}" 
+                      {{#disabled}}disabled{{/disabled}}
+                      role="button" 
+                      tabindex="0"
+                      aria-label="{{value}} star(s)">
+                    <i class="fa fa-star{{^selected}}-o{{/selected}}"></i>
+                </span>
+                {{/stars}}
+                <span class="star-rating-text">(<span class="current-rating">{{value}}</span>/{{qelements.maxstars}})</span>
+            </div>
+        </div>
+        {{/qelements.rows}}
+    </fieldset>
+</div>

@@ -1,0 +1,139 @@
+/* Star Rating Question Styles */
+.star-rating-question {
+    margin: 20px 0;
+}
+
+.star-rating-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.star-rating-row {
+    margin: 15px 0;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.star-rating-row:last-child {
+    border-bottom: none;
+}
+
+.star-rating-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.required-label {
+    color: #d9534f;
+    margin-left: 3px;
+}
+
+.star-rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.star {
+    cursor: pointer;
+    font-size: 24px;
+    color: #ddd;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.star:hover,
+.star.star-hover {
+    color: #ffa500;
+    transform: scale(1.1);
+}
+
+.star.star-selected {
+    color: #ff9500;
+}
+
+.star[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.star-rating-text {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.current-rating {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Response Display Styles */
+.response-star-rating {
+    padding: 10px 0;
+}
+
+.star-rating-response-row {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.star-rating-response-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.star-rating-response-stars {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.star-rating-response-stars i {
+    font-size: 20px;
+    color: #ddd;
+}
+
+.star-rating-response-stars i.star-filled {
+    color: #ff9500;
+}
+
+.star-rating-response-value {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .star {
+        font-size: 20px;
+    }
+    
+    .star-rating-response-stars i {
+        font-size: 18px;
+    }
+    
+    .star-rating-stars {
+        flex-wrap: wrap;
+    }
+}
+
+/* Accessibility improvements */
+.star:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.star-rating-value {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
