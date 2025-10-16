@@ -285,6 +285,51 @@ class starrating extends question {
     }
 
     /**
+     * Override to make choices field optional (not required).
+     * @param \MoodleQuickForm $mform
+     * @return string
+     */
+    protected function form_choices(\MoodleQuickForm $mform) {
+        if ($this->has_choices()) {
+            $numchoices = count($this->choices);
+            $allchoices = '';
+            foreach ($this->choices as $choice) {
+                if (!empty($allchoices)) {
+                    $allchoices .= "\n";
+                }
+                $allchoices .= $choice->content;
+            }
+
+            $helpname = $this->helpname();
+
+            $mform->addElement('html', '<div class="qoptcontainer">');
+            $options = ['wrap' => 'virtual', 'class' => 'qopts'];
+            $mform->addElement('textarea', 'allchoices', get_string('possibleanswers', 'questionnaire'), $options);
+            $mform->setType('allchoices', PARAM_RAW);
+            // 注意：这里没有添加 'required' 规则，使它成为可选字段
+            $mform->addHelpButton('allchoices', $helpname, 'questionnaire');
+            $mform->addElement('html', '</div>');
+            $mform->addElement('hidden', 'num_choices', $numchoices);
+            $mform->setType('num_choices', PARAM_INT);
+        }
+        return $allchoices ?? '';
+    }
+
+    /**
+     * Override this function for question specific choice preprocessing.
+     * Allow empty choices field, similar to Rate question type.
+     * @param \stdClass $formdata
+     * @return bool
+     */
+    protected function form_preprocess_choicedata($formdata) {
+        if (empty($formdata->allchoices)) {
+            // Add dummy blank space character for empty value.
+            $formdata->allchoices = " ";
+        }
+        return true;
+    }
+
+    /**
      * True if question provides mobile support.
      * @return bool
      */
