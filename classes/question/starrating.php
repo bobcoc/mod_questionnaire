@@ -34,15 +34,8 @@ class starrating extends question {
      * @param array $params
      */
     public function __construct($id = 0, $question = null, $context = null, $params = []) {
-        // Initialize question object if null
-        if ($question === null) {
-            $question = new \stdClass();
-        }
-        
-        // Default to 5 stars if not specified
-        if (!isset($question->length) || $question->length == 0) {
-            $question->length = 5;
-        }
+        // Set default length to 5 stars (like Rate does with $this->length)
+        $this->length = 5;
         
         parent::__construct($id, $question, $context, $params);
     }
@@ -278,6 +271,16 @@ class starrating extends question {
         $mform->setDefault('length', 5);
         $mform->addHelpButton('length', 'maxstars', 'questionnaire');
         return $mform;
+    }
+
+    /**
+     * Return the form precision (hidden for star rating).
+     * @param \MoodleQuickForm $mform
+     * @param string $helptext
+     * @return \MoodleQuickForm
+     */
+    protected function form_precise(\MoodleQuickForm $mform, $helptext = '') {
+        return question::form_precise_hidden($mform);
     }
 
     /**
