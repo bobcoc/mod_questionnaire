@@ -1,34 +1,12 @@
 {{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-}}
-{{!
     @template mod_questionnaire/question_starrating
     
-    Star Rating question display template.
-    
-    Context variables required for this template:
-    * question - The question object
-    * qelements - Question elements including rows and maxstars
+    Star Rating question display template - Multiple rows support
 }}
-<div class="qn-container star-rating-question" id="starrating_{{question.id}}">
-    <fieldset class="star-rating-fieldset">
-        <legend class="sr-only">{{qelements.caption}}</legend>
-        
+<div class="qn-container star-rating-question">
+    <div class="star-rating-table">
         {{#qelements.rows}}
-        <div class="star-rating-row" data-question-id="{{question.id}}" data-choice-id="{{choiceid}}">
+        <div class="star-rating-row" data-choice-id="{{choiceid}}">
             <div class="star-rating-label">
                 {{{content}}}
                 {{#question.required}}
@@ -51,5 +29,55 @@
             </div>
         </div>
         {{/qelements.rows}}
-    </fieldset>
+    </div>
 </div>
+<script>
+// 初始化星级评分 - 支持多行
+(function() {
+    var rows = document.querySelectorAll('.star-rating-row');
+    
+    rows.forEach(function(row) {
+        var stars = row.querySelectorAll('.star:not([disabled])');
+        var input = row.querySelector('.star-rating-value');
+        var ratingText = row.querySelector('.current-rating');
+        var currentValue = parseInt(input.value) || 0;
+        
+        // 初始化显示
+        updateStars(stars, currentValue);
+        
+        // 点击处理
+        stars.forEach(function(star) {
+            star.addEventListener('click', function() {
+                var value = parseInt(this.getAttribute('data-value'));
+                if (currentValue === value) value = 0; // 允许取消
+                currentValue = value;
+                input.value = value;
+                ratingText.textContent = value;
+                updateStars(stars, value);
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                updateStars(stars, parseInt(this.getAttribute('data-value')), true);
+            });
+        });
+        
+        row.querySelector('.star-rating-stars').addEventListener('mouseleave', function() {
+            updateStars(stars, currentValue);
+        });
+    });
+    
+    function updateStars(stars, value, isHover) {
+        stars.forEach(function(star, index) {
+            var starValue = index + 1;
+            var icon = star.querySelector('i');
+            if (starValue <= value) {
+                icon.className = 'fa fa-star';
+                star.style.color = isHover ? '#ffa500' : '#ff9500';
+            } else {
+                icon.className = 'fa fa-star-o';
+                star.style.color = '#ddd';
+            }
+        });
+    }
+})();
+</script>

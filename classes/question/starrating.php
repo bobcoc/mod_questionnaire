@@ -18,7 +18,7 @@ namespace mod_questionnaire\question;
 
 /**
  * Star Rating question type class for questionnaire.
- * Similar to Taobao star rating system.
+ * Based on Rate question type to support multiple rating items.
  *
  * @package    mod_questionnaire
  * @copyright  2025 Your Name
@@ -110,25 +110,22 @@ class starrating extends question {
     /**
      * Return the context tags for the star rating question display.
      * @param \mod_questionnaire\responsetype\response\response $response
-     * @param string $descendantsdata
+     * @param array $dependants
      * @param boolean $blankquestionnaire
      * @return object The star rating question context tags.
      */
-    protected function question_survey_display($response, $descendantsdata, $blankquestionnaire = false) {
+    protected function question_survey_display($response, $dependants = [], $blankquestionnaire = false) {
         global $PAGE;
 
-        // Add required CSS and JavaScript
+        // Add required CSS
         $PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
-        $PAGE->requires->js('/mod/questionnaire/javascript/starrating.js');
 
         $choicetags = new \stdClass();
         $choicetags->qelements = [];
-        $choicetags->qelements['caption'] = strip_tags($this->content);
-
-        $disabled = $blankquestionnaire ? ' disabled="disabled"' : '';
-
         $choicetags->qelements['maxstars'] = $this->length;
         $choicetags->qelements['rows'] = [];
+
+        $disabled = $blankquestionnaire ? ' disabled="disabled"' : '';
 
         foreach ($this->choices as $cid => $choice) {
             $rowobj = new \stdClass();
@@ -140,12 +137,12 @@ class starrating extends question {
             // Get current value if exists
             $currentvalue = 0;
             if (isset($response->answers[$this->id][$cid])) {
-                $currentvalue = $response->answers[$this->id][$cid]->value;
+                $currentvalue = intval($response->answers[$this->id][$cid]->value);
             }
             $rowobj->value = $currentvalue;
             $rowobj->disabled = !empty($disabled);
 
-            // Generate stars
+            // Generate stars data
             $rowobj->stars = [];
             for ($i = 1; $i <= $this->length; $i++) {
                 $star = new \stdClass();
@@ -177,7 +174,7 @@ class starrating extends question {
             // Get the star rating value
             $value = 0;
             if (isset($response->answers[$this->id][$cid])) {
-                $value = $response->answers[$this->id][$cid]->value;
+                $value = intval($response->answers[$this->id][$cid]->value);
             }
             $rowobj->value = $value;
 
@@ -201,7 +198,7 @@ class starrating extends question {
      * @return boolean
      */
     public function response_complete($responsedata) {
-        if (!is_a($responsedata, 'mod_questionnaire\responsetype\response\response')) {
+        if (!is_a($responsedata, 'mod_questionnaire\\responsetype\\response\\response')) {
             $response = \mod_questionnaire\responsetype\response\response::response_from_webform($responsedata, [$this]);
         } else {
             $response = $responsedata;
@@ -237,7 +234,7 @@ class starrating extends question {
      * @return boolean
      */
     public function response_valid($responsedata) {
-        if (!is_a($responsedata, 'mod_questionnaire\responsetype\response\response')) {
+        if (!is_a($responsedata, 'mod_questionnaire\\responsetype\\response\\response')) {
             $response = \mod_questionnaire\responsetype\response\response::response_from_webform($responsedata, [$this]);
         } else {
             $response = $responsedata;

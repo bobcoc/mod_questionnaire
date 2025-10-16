@@ -101,6 +101,13 @@ function xmldb_questionnaire_install() {
     $id = $DB->insert_record('questionnaire_question_type', $questiontype);
 
     $questiontype = new stdClass();
+    $questiontype->typeid = 12;
+    $questiontype->type = 'Star Rating';
+    $questiontype->has_choices = 'y';
+    $questiontype->response_table = 'response_rank';
+    $id = $DB->insert_record('questionnaire_question_type', $questiontype);
+
+    $questiontype = new stdClass();
     $questiontype->typeid = 99;
     $questiontype->type = 'Page Break';
     $questiontype->has_choices = 'n';
