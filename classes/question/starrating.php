@@ -120,9 +120,9 @@ class starrating extends question {
         $PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
 
         $choicetags = new \stdClass();
-        $choicetags->qelements = [];
-        $choicetags->qelements['maxstars'] = $this->length;
-        $choicetags->qelements['rows'] = [];
+        $choicetags->qelements = new \stdClass();
+        $choicetags->qelements->maxstars = $this->length;
+        $choicetags->qelements->rows = [];
 
         $disabled = $blankquestionnaire ? ' disabled="disabled"' : '';
 
@@ -132,6 +132,7 @@ class starrating extends question {
             $rowobj->name = $str;
             $rowobj->content = format_text($choice->content, FORMAT_HTML, ['noclean' => true]);
             $rowobj->choiceid = $cid;
+            $rowobj->maxstars = $this->length; // 添加到每行以便访问
 
             // Get current value if exists
             $currentvalue = 0;
@@ -150,7 +151,7 @@ class starrating extends question {
                 $rowobj->stars[] = $star;
             }
 
-            $choicetags->qelements['rows'][] = $rowobj;
+            $choicetags->qelements->rows[] = $rowobj;
         }
 
         return $choicetags;

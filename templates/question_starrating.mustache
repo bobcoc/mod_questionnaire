@@ -3,15 +3,13 @@
     
     Star Rating question display template - Multiple rows support
 }}
+{{#qelements}}
 <div class="qn-container star-rating-question">
     <div class="star-rating-table">
-        {{#qelements.rows}}
+        {{#rows}}
         <div class="star-rating-row" data-choice-id="{{choiceid}}">
             <div class="star-rating-label">
                 {{{content}}}
-                {{#question.required}}
-                <span class="required-label">*</span>
-                {{/question.required}}
             </div>
             <div class="star-rating-stars">
                 <input type="hidden" name="{{name}}" value="{{value}}" class="star-rating-value">
@@ -25,10 +23,10 @@
                     <i class="fa fa-star{{^selected}}-o{{/selected}}"></i>
                 </span>
                 {{/stars}}
-                <span class="star-rating-text">(<span class="current-rating">{{value}}</span>/{{qelements.maxstars}})</span>
+                <span class="star-rating-text">(<span class="current-rating">{{value}}</span>/{{maxstars}})</span>
             </div>
         </div>
-        {{/qelements.rows}}
+        {{/rows}}
     </div>
 </div>
 <script>
@@ -81,3 +79,4 @@
     }
 })();
 </script>
+{{/qelements}}
