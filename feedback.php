@@ -151,6 +151,10 @@ if ($settings = $feedbackform->get_data()) {
 $PAGE->set_title(get_string('editingfeedback', 'questionnaire'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->navbar->add(get_string('editingfeedback', 'questionnaire'));
+
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 echo $questionnaire->renderer->header();
 require('tabs.php');
 if (!$validquestions) {

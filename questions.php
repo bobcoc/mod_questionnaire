@@ -350,6 +350,10 @@ if ($action == 'question') {
 $PAGE->set_title($streditquestion);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->navbar->add($streditquestion);
+
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 echo $questionnaire->renderer->header();
 require('tabs.php');
 

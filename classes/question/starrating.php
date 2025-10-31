@@ -114,11 +114,6 @@ class starrating extends question {
      * @return object The star rating question context tags.
      */
     protected function question_survey_display($response, $dependants = [], $blankquestionnaire = false) {
-        global $PAGE;
-
-        // Add required CSS
-        $PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
-
         $choicetags = new \stdClass();
         $choicetags->qelements = new \stdClass();
         $choicetags->qelements->maxstars = $this->length;

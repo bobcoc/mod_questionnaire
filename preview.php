@@ -118,10 +118,9 @@ if (!$popup) {
     $PAGE->set_heading(format_string($course->fullname));
 }
 
-// Include the needed js.
-
-
+// Include the needed js and css.
 $PAGE->requires->js('/mod/questionnaire/module.js');
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
 // Print the tabs.
 
 

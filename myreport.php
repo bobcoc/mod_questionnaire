@@ -72,6 +72,9 @@ $PAGE->set_context($context);
 $PAGE->set_title(get_string('questionnairereport', 'questionnaire'));
 $PAGE->set_heading(format_string($course->fullname));
 
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 $questionnaire = new questionnaire($course, $cm, 0, $questionnaire);
 // Add renderer and page objects to the questionnaire object for display use.
 $questionnaire->add_renderer($PAGE->get_renderer('mod_questionnaire'));

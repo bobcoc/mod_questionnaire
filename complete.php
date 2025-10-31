@@ -81,6 +81,9 @@ if ($resume) {
 // Generate the view HTML in the page.
 $questionnaire->view();
 
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 // Output the page.
 echo $questionnaire->renderer->header();
 echo $questionnaire->renderer->render($questionnaire->page);

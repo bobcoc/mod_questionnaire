@@ -73,6 +73,10 @@ $url->param('sec', $sec);
 $PAGE->set_url($url);
 $PAGE->set_title($questionnaire->survey->title);
 $PAGE->set_pagelayout('popup');
+
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 echo $questionnaire->renderer->header();
 $questionnaire->page->add_to_page('closebutton', $questionnaire->renderer->close_window_button());
 $questionnaire->survey_print_render($courseid, '', 'print', $rid, $blankquestionnaire);

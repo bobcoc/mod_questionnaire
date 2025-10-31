@@ -127,6 +127,9 @@ if ($outputtarget == 'print') {
     $PAGE->set_pagelayout('popup');
 }
 
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 // Tab setup.
 if (!isset($SESSION->questionnaire)) {
     $SESSION->questionnaire = new stdClass();

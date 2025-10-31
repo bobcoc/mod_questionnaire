@@ -54,6 +54,10 @@ $context = context_module::instance($cm->id);
 $url = new moodle_url('/mod/questionnaire/fbsections.php', ['id' => $id]);
 $PAGE->set_url($url);
 $PAGE->set_context($context);
+
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 if (!isset($SESSION->questionnaire)) {
     $SESSION->questionnaire = new stdClass();
 }

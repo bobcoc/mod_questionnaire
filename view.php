@@ -64,6 +64,9 @@ $questionnaire->add_page(new \mod_questionnaire\output\viewpage());
 $PAGE->set_title(format_string($questionnaire->name));
 $PAGE->set_heading(format_string($course->fullname));
 
+// Include required CSS for star rating questions.
+$PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
+
 echo $questionnaire->renderer->header();
 // No need to print out intro or name in Moodle 4 and above.
 
