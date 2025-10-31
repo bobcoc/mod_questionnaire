@@ -500,8 +500,24 @@ switch ($action) {
         $emailroles = optional_param('emailroles', 0, PARAM_INT);
         $emailextra = optional_param('emailextra', '', PARAM_RAW);
 
+        // Suppress warnings during CSV generation to prevent output buffering issues.
+        $olderrorhandler = set_error_handler(function($errno, $errstr, $errfile, $errline) {
+            // Silently ignore warnings and notices during CSV generation.
+            if (!(error_reporting() & $errno)) {
+                return false;
+            }
+            return true;
+        });
+
         $output = $questionnaire->generate_csv($currentgroupid, '', $user, $choicecodes, $choicetext, $showincompletes,
             $rankaverages);
+
+        // Restore error handler.
+        if ($olderrorhandler !== null) {
+            set_error_handler($olderrorhandler);
+        } else {
+            restore_error_handler();
+        }
 
         $columns = $output[0];
         unset($output[0]);
@@ -509,6 +525,10 @@ switch ($action) {
         // Check if email report was selected.
         $emailreport = optional_param('emailreport', '', PARAM_ALPHA);
         if (empty($emailreport)) {
+            // Clean any output buffer before downloading to prevent "Output can not be buffered" error.
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
             \core\dataformat::download_data($name, $dataformat, $columns, $output);
         } else {
             // Emailreport button selected.
