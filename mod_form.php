@@ -87,6 +87,9 @@ class mod_questionnaire_mod_form extends moodleform_mod {
 
         $mform->addElement('advcheckbox', 'progressbar', get_string('progressbar', 'questionnaire'));
 
+        $mform->addElement('advcheckbox', 'personalfileenabled', get_string('personalfileenabled', 'questionnaire'));
+        $mform->addHelpButton('personalfileenabled', 'personalfileenabled', 'questionnaire');
+
         // Removed potential scales from list of grades. CONTRIB-3167.
         $grades[0] = get_string('nograde');
         for ($i = 100; $i >= 1; $i--) {

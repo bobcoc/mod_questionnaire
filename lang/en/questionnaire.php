@@ -24,6 +24,21 @@
  */
 
 $string['accessibility:rate:choice'] = 'Row {$a->rowposition}, {$a->choicetitle}: Column {$a->colposition}, {$a->choiceanswer}.';
+$string['personalfileenabled'] = 'Enable personalized files';
+$string['personalfileenabled_help'] = 'When enabled, each student will see only their own personalized file (named with their student ID number) when taking the questionnaire. Useful for personal photo voting or similar scenarios where privacy is important.';
+$string['personalfile_upload'] = 'Upload personalized files';
+$string['personalfile_uploadhelp'] = 'Upload files named with student ID numbers (e.g., 20231001.jpg, 20231002.png). Each student will only see their own file when taking the questionnaire.';
+$string['personalfile_imported'] = '{$a} file(s) successfully imported.';
+$string['personalfile_usernotfound'] = 'Student with ID number "{$a}" not found.';
+$string['personalfile_usernotenrolled'] = 'Student with ID number "{$a}" is not enrolled in this course.';
+$string['personalfile_deleted'] = 'File deleted successfully.';
+$string['personalfile_existing'] = 'Existing personalized files';
+$string['personalfile_nofiles'] = 'No personalized files uploaded yet.';
+$string['personalfile_manage'] = 'Manage personalized files';
+$string['personalfile_yourfile'] = 'Your personalized file';
+$string['personalfile_notfound'] = 'No personalized file found for you.';
+$string['filename'] = 'File name';
+$string['timeuploaded'] = 'Time uploaded';
 $string['action'] = 'Action';
 $string['activityoverview'] = 'You have questionnaires that are due';
 $string['additionalinfo'] = 'Additional Info';

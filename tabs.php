@@ -54,6 +54,11 @@ if ($questionnaire->capabilities->editquestions && $owner) {
             'id='.$questionnaire->cm->id), get_string('feedback'));
 }
 
+if ($questionnaire->capabilities->manage && $owner && !empty($questionnaire->personalfileenabled)) {
+    $row[] = new tabobject('personalfiles', $CFG->wwwroot.htmlspecialchars('/mod/questionnaire/personalfiles.php?'.
+            'id='.$questionnaire->cm->id), get_string('personalfile_manage', 'questionnaire'));
+}
+
 if ($questionnaire->capabilities->preview && $owner) {
     if (!empty($questionnaire->questions)) {
         $row[] = new tabobject('preview', $CFG->wwwroot.htmlspecialchars('/mod/questionnaire/preview.php?'.

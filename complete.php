@@ -81,6 +81,31 @@ if ($resume) {
 // Generate the view HTML in the page.
 $questionnaire->view();
 
+// Display personalized file if enabled.
+if (!empty($questionnaire->personalfileenabled)) {
+    $personalfileurl = $questionnaire->get_personal_file_url($USER->id);
+    if ($personalfileurl) {
+        $personalfilecontent = html_writer::start_div('personalfile-container alert alert-info');
+        $personalfilecontent .= html_writer::tag('h4', get_string('personalfile_yourfile', 'questionnaire'));
+        $personalfilecontent .= html_writer::empty_tag('img', [
+            'src' => $personalfileurl->out(),
+            'alt' => get_string('personalfile_yourfile', 'questionnaire'),
+            'class' => 'personalfile-image img-fluid',
+            'style' => 'max-width: 100%; height: auto; margin: 10px 0;'
+        ]);
+        $personalfilecontent .= html_writer::end_div();
+        
+        // Add to page before the questionnaire form.
+        $questionnaire->page->add_to_page('personalfile', $personalfilecontent);
+    } else {
+        $personalfilecontent = html_writer::div(
+            get_string('personalfile_notfound', 'questionnaire'),
+            'alert alert-warning'
+        );
+        $questionnaire->page->add_to_page('personalfile', $personalfilecontent);
+    }
+}
+
 // Include required CSS for star rating questions.
 $PAGE->requires->css('/mod/questionnaire/styles_starrating.css');
 

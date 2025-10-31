@@ -54,6 +54,56 @@ class questionnaire {
      */
     public $page = false;
 
+    /**
+     * Get personalized file for a specific user.
+     * @param int $userid User ID
+     * @return object|false File record or false if not found
+     */
+    public function get_personal_file($userid) {
+        global $DB;
+        
+        if (empty($this->personalfileenabled)) {
+            return false;
+        }
+        
+        return $DB->get_record('questionnaire_personal_file', [
+            'questionnaireid' => $this->id,
+            'userid' => $userid
+        ]);
+    }
+
+    /**
+     * Get personalized file URL for display.
+     * @param int $userid User ID
+     * @return moodle_url|false URL of the personalized file or false
+     */
+    public function get_personal_file_url($userid) {
+        global $DB;
+        
+        $filerecord = $this->get_personal_file($userid);
+        if (!$filerecord) {
+            return false;
+        }
+        
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($this->context->id, 'mod_questionnaire', 'personalfile', 
+            $filerecord->id, 'itemid, filepath, filename', false);
+        
+        if (empty($files)) {
+            return false;
+        }
+        
+        $file = reset($files);
+        return moodle_url::make_pluginfile_url(
+            $this->context->id,
+            'mod_questionnaire',
+            'personalfile',
+            $filerecord->id,
+            $file->get_filepath(),
+            $file->get_filename()
+        );
+    }
+
     // Class Methods.
 
     /**

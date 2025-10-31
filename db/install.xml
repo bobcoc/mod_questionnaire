@@ -26,6 +26,7 @@
         <FIELD NAME="completionsubmit" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Questionnaire marked as 'complete' when submitted."/>
         <FIELD NAME="autonum" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="3" SEQUENCE="false" COMMENT="option for auto numbering questions and pages (both selected by default)"/>
         <FIELD NAME="progressbar" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Display a progress bar at top of questionnaire."/>
+        <FIELD NAME="personalfileenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Enable personalized file display for each student."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -270,6 +271,28 @@
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="questionnaire_question" REFFIELDS="id" />
         <KEY NAME="surveyid" TYPE="foreign" FIELDS="surveyid" REFTABLE="questionnaire_survey" REFFIELDS="id" />
       </KEYS>
+    </TABLE>
+    <TABLE NAME="questionnaire_personal_file" COMMENT="Stores personalized files for each student in questionnaire">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionnaireid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of questionnaire"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User ID (student)"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Student ID number"/>
+        <FIELD NAME="filearea" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="personalfile" SEQUENCE="false"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Original filename"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionnaireid" TYPE="foreign" FIELDS="questionnaireid" REFTABLE="questionnaire" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="questionnaire_user" UNIQUE="false" FIELDS="questionnaireid, userid"/>
+        <INDEX NAME="questionnaire_idnumber" UNIQUE="false" FIELDS="questionnaireid, idnumber"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

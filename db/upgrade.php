@@ -1002,6 +1002,48 @@ function xmldb_questionnaire_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022121600.02, 'questionnaire');
     }
 
+    if ($oldversion < 2025103100) {
+        // Define table questionnaire_personal_file to be created.
+        $table = new xmldb_table('questionnaire_personal_file');
+
+        // Adding fields to table questionnaire_personal_file.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('questionnaireid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('filearea', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'personalfile');
+        $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('filename', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table questionnaire_personal_file.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('questionnaireid', XMLDB_KEY_FOREIGN, ['questionnaireid'], 'questionnaire', ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Adding indexes to table questionnaire_personal_file.
+        $table->add_index('questionnaire_user', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'userid']);
+        $table->add_index('questionnaire_idnumber', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'idnumber']);
+
+        // Conditionally launch create table for questionnaire_personal_file.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Add personal file enabled field to questionnaire table.
+        $table = new xmldb_table('questionnaire');
+        $field = new xmldb_field('personalfileenabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'progressbar');
+
+        // Conditionally launch add field personalfileenabled.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Questionnaire savepoint reached.
+        upgrade_mod_savepoint(true, 2025103100, 'questionnaire');
+    }
+
     return true;
 }
 

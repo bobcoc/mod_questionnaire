@@ -1311,3 +1311,56 @@ function mod_questionnaire_coursemodule_edit_post_actions($data, $course) {
 
     return $data;
 }
+
+/**
+ * Serve the files from the questionnaire file areas.
+ *
+ * @param stdClass $course the course object
+ * @param stdClass $cm the course module object
+ * @param stdClass $context the context
+ * @param string $filearea the name of the file area
+ * @param array $args extra arguments (itemid, path)
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if the file not found, just send the file otherwise and do not return anything
+ */
+function questionnaire_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $DB, $USER;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_login($course, true, $cm);
+
+    // Handle personalized files.
+    if ($filearea === 'personalfile') {
+        $itemid = (int)array_shift($args);
+        
+        // Get the file record.
+        $filerecord = $DB->get_record('questionnaire_personal_file', ['id' => $itemid]);
+        if (!$filerecord) {
+            return false;
+        }
+        
+        // Security check: only the owner or users with manage capability can view the file.
+        $canmanage = has_capability('mod/questionnaire:manage', $context);
+        if (!$canmanage && $filerecord->userid != $USER->id) {
+            return false;
+        }
+        
+        $relativepath = implode('/', $args);
+        $fullpath = "/$context->id/mod_questionnaire/$filearea/$itemid/$relativepath";
+        
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        
+        if (!$file || $file->is_directory()) {
+            return false;
+        }
+        
+        send_stored_file($file, 0, 0, $forcedownload, $options);
+    }
+
+    return false;
+}
