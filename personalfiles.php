@@ -55,79 +55,74 @@ $PAGE->set_heading(format_string($course->fullname));
 if ($action == 'upload' && confirm_sesskey()) {
     require_once($CFG->dirroot.'/lib/filelib.php');
     
-    $draftitemid = file_get_submitted_draft_itemid('personalfiles');
-    
-    if ($draftitemid) {
+    if (!empty($_FILES['personalfiles']['name'][0])) {
         $fs = get_file_storage();
-        $usercontext = context_user::instance($USER->id);
-        
-        // Get all files from draft area.
-        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'itemid, filepath, filename', false);
-        
         $imported = 0;
         $errors = [];
         
-        foreach ($draftfiles as $file) {
-            $filename = $file->get_filename();
-            
-            // Extract student ID from filename (before extension).
-            $pathinfo = pathinfo($filename);
-            $idnumber = $pathinfo['filename'];
-            
-            // Find user by idnumber.
-            if ($user = $DB->get_record('user', ['idnumber' => $idnumber])) {
-                // Check if user is enrolled in course.
-                if (is_enrolled($context, $user->id)) {
-                    // Check if record already exists.
-                    $existing = $DB->get_record('questionnaire_personal_file', [
-                        'questionnaireid' => $questionnaire->id,
-                        'userid' => $user->id
-                    ]);
-                    
-                    $record = new stdClass();
-                    $record->questionnaireid = $questionnaire->id;
-                    $record->userid = $user->id;
-                    $record->idnumber = $idnumber;
-                    $record->filename = $filename;
-                    $record->filearea = 'personalfile';
-                    $record->timemodified = time();
-                    
-                    if ($existing) {
-                        // Delete old file.
-                        $fs->delete_area_files($context->id, 'mod_questionnaire', 'personalfile', $existing->id);
+        $filecount = count($_FILES['personalfiles']['name']);
+        
+        for ($i = 0; $i < $filecount; $i++) {
+            if ($_FILES['personalfiles']['error'][$i] == UPLOAD_ERR_OK) {
+                $filename = $_FILES['personalfiles']['name'][$i];
+                $tmpfile = $_FILES['personalfiles']['tmp_name'][$i];
+                
+                // Extract student ID from filename (before extension).
+                $pathinfo = pathinfo($filename);
+                $idnumber = $pathinfo['filename'];
+                
+                // Find user by idnumber.
+                if ($user = $DB->get_record('user', ['idnumber' => $idnumber])) {
+                    // Check if user is enrolled in course.
+                    if (is_enrolled($context, $user->id)) {
+                        // Check if record already exists.
+                        $existing = $DB->get_record('questionnaire_personal_file', [
+                            'questionnaireid' => $questionnaire->id,
+                            'userid' => $user->id
+                        ]);
                         
-                        // Update record.
-                        $record->id = $existing->id;
-                        $DB->update_record('questionnaire_personal_file', $record);
-                        $itemid = $existing->id;
+                        $record = new stdClass();
+                        $record->questionnaireid = $questionnaire->id;
+                        $record->userid = $user->id;
+                        $record->idnumber = $idnumber;
+                        $record->filename = $filename;
+                        $record->filearea = 'personalfile';
+                        $record->timemodified = time();
+                        
+                        if ($existing) {
+                            // Delete old file.
+                            $fs->delete_area_files($context->id, 'mod_questionnaire', 'personalfile', $existing->id);
+                            
+                            // Update record.
+                            $record->id = $existing->id;
+                            $DB->update_record('questionnaire_personal_file', $record);
+                            $itemid = $existing->id;
+                        } else {
+                            // Create new record.
+                            $record->timecreated = time();
+                            $itemid = $DB->insert_record('questionnaire_personal_file', $record);
+                        }
+                        
+                        // Save file to proper location.
+                        $filerecord = [
+                            'contextid' => $context->id,
+                            'component' => 'mod_questionnaire',
+                            'filearea' => 'personalfile',
+                            'itemid' => $itemid,
+                            'filepath' => '/',
+                            'filename' => $filename
+                        ];
+                        
+                        $fs->create_file_from_pathname($filerecord, $tmpfile);
+                        $imported++;
                     } else {
-                        // Create new record.
-                        $record->timecreated = time();
-                        $itemid = $DB->insert_record('questionnaire_personal_file', $record);
+                        $errors[] = get_string('personalfile_usernotenrolled', 'questionnaire', $idnumber);
                     }
-                    
-                    // Save file to proper location.
-                    $filerecord = [
-                        'contextid' => $context->id,
-                        'component' => 'mod_questionnaire',
-                        'filearea' => 'personalfile',
-                        'itemid' => $itemid,
-                        'filepath' => '/',
-                        'filename' => $filename
-                    ];
-                    
-                    $fs->create_file_from_storedfile($filerecord, $file);
-                    $imported++;
                 } else {
-                    $errors[] = get_string('personalfile_usernotenrolled', 'questionnaire', $idnumber);
+                    $errors[] = get_string('personalfile_usernotfound', 'questionnaire', $idnumber);
                 }
-            } else {
-                $errors[] = get_string('personalfile_usernotfound', 'questionnaire', $idnumber);
             }
         }
-        
-        // Clean up draft files.
-        file_clear_draft_area($draftitemid);
         
         if ($imported > 0) {
             \core\notification::success(get_string('personalfile_imported', 'questionnaire', $imported));
@@ -173,16 +168,19 @@ echo html_writer::start_tag('form', [
 
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
-$draftitemid = file_get_submitted_draft_itemid('personalfiles');
-file_prepare_draft_area($draftitemid, $context->id, 'mod_questionnaire', 'personalfile_temp', 0);
-
-$options = [
-    'maxbytes' => $course->maxbytes,
-    'maxfiles' => 50,
-    'accepted_types' => ['image']
-];
-
-echo $OUTPUT->file_picker('personalfiles', $draftitemid, $options);
+// Use standard file input instead of file_picker.
+echo html_writer::start_tag('div', ['class' => 'form-group']);
+echo html_writer::tag('label', get_string('personalfile_upload', 'questionnaire'), ['for' => 'personalfiles']);
+echo html_writer::empty_tag('input', [
+    'type' => 'file',
+    'name' => 'personalfiles[]',
+    'id' => 'personalfiles',
+    'multiple' => 'multiple',
+    'accept' => 'image/*',
+    'class' => 'form-control'
+]);
+echo html_writer::tag('small', get_string('personalfile_uploadhelp', 'questionnaire'), ['class' => 'form-text text-muted']);
+echo html_writer::end_tag('div');
 
 echo html_writer::empty_tag('br');
 echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('upload'), 'class' => 'btn btn-primary']);
