@@ -1359,7 +1359,9 @@ function questionnaire_pluginfile($course, $cm, $context, $filearea, $args, $for
             return false;
         }
         
+        // Send the file - this will terminate the script.
         send_stored_file($file, 0, 0, $forcedownload, $options);
+        return; // This line will never be reached, but is here for clarity.
     }
 
     return false;
