@@ -1010,7 +1010,7 @@ function xmldb_questionnaire_upgrade($oldversion=0) {
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('questionnaireid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('lastname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
         $table->add_field('filearea', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'personalfile');
         $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('filename', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
@@ -1024,7 +1024,7 @@ function xmldb_questionnaire_upgrade($oldversion=0) {
 
         // Adding indexes to table questionnaire_personal_file.
         $table->add_index('questionnaire_user', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'userid']);
-        $table->add_index('questionnaire_idnumber', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'idnumber']);
+        $table->add_index('questionnaire_lastname', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'lastname']);
 
         // Conditionally launch create table for questionnaire_personal_file.
         if (!$dbman->table_exists($table)) {
@@ -1042,6 +1042,51 @@ function xmldb_questionnaire_upgrade($oldversion=0) {
 
         // Questionnaire savepoint reached.
         upgrade_mod_savepoint(true, 2025103100, 'questionnaire');
+    }
+
+    if ($oldversion < 2025103101) {
+        // Rename idnumber field to lastname in questionnaire_personal_file table.
+        $table = new xmldb_table('questionnaire_personal_file');
+        
+        // Check if table exists.
+        if ($dbman->table_exists($table)) {
+            $oldfield = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+            $newfield = new xmldb_field('lastname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+            
+            try {
+                // Only proceed if idnumber exists and lastname doesn't exist.
+                if ($dbman->field_exists($table, $oldfield) && !$dbman->field_exists($table, $newfield)) {
+                    // Drop the old index first.
+                    $index = new xmldb_index('questionnaire_idnumber', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'idnumber']);
+                    if ($dbman->index_exists($table, $index)) {
+                        $dbman->drop_index($table, $index);
+                    }
+                    
+                    // Rename the field.
+                    $dbman->rename_field($table, $oldfield, 'lastname');
+                }
+                
+                // Ensure the new index exists (whether field was renamed or already existed).
+                if ($dbman->field_exists($table, $newfield)) {
+                    $index = new xmldb_index('questionnaire_lastname', XMLDB_INDEX_NOTUNIQUE, ['questionnaireid', 'lastname']);
+                    if (!$dbman->index_exists($table, $index)) {
+                        $dbman->add_index($table, $index);
+                    }
+                }
+            } catch (Exception $e) {
+                // Log the error but don't fail the upgrade if field already migrated.
+                debugging('questionnaire_personal_file field migration: ' . $e->getMessage(), DEBUG_DEVELOPER);
+                // Check if lastname field exists - if yes, migration was already done manually.
+                if (!$dbman->field_exists($table, $newfield)) {
+                    // If lastname doesn't exist, this is a real error, rethrow it.
+                    throw $e;
+                }
+                // Otherwise, continue - manual migration was successful.
+            }
+        }
+        
+        // Questionnaire savepoint reached.
+        upgrade_mod_savepoint(true, 2025103101, 'questionnaire');
     }
 
     return true;

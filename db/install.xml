@@ -277,7 +277,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionnaireid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of questionnaire"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User ID (student)"/>
-        <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Student ID number"/>
+        <FIELD NAME="lastname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Student lastname for matching"/>
         <FIELD NAME="filearea" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="personalfile" SEQUENCE="false"/>
         <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Original filename"/>
@@ -291,7 +291,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="questionnaire_user" UNIQUE="false" FIELDS="questionnaireid, userid"/>
-        <INDEX NAME="questionnaire_idnumber" UNIQUE="false" FIELDS="questionnaireid, idnumber"/>
+        <INDEX NAME="questionnaire_lastname" UNIQUE="false" FIELDS="questionnaireid, lastname"/>
       </INDEXES>
     </TABLE>
   </TABLES>
