@@ -69,10 +69,10 @@ if ($action == 'upload' && confirm_sesskey()) {
                 
                 // Extract student ID from filename (before extension).
                 $pathinfo = pathinfo($filename);
-                $idnumber = $pathinfo['filename'];
+                $lastname = $pathinfo['filename'];
                 
-                // Find user by idnumber.
-                if ($user = $DB->get_record('user', ['idnumber' => $idnumber])) {
+                // Find user by lastname.
+                if ($user = $DB->get_record('user', ['lastname' => $lastname])) {
                     // Check if user is enrolled in course.
                     if (is_enrolled($context, $user->id)) {
                         // Check if record already exists.
@@ -84,7 +84,7 @@ if ($action == 'upload' && confirm_sesskey()) {
                         $record = new stdClass();
                         $record->questionnaireid = $questionnaire->id;
                         $record->userid = $user->id;
-                        $record->idnumber = $idnumber;
+                        $record->lastname = $lastname;
                         $record->filename = $filename;
                         $record->filearea = 'personalfile';
                         $record->timemodified = time();
@@ -116,10 +116,10 @@ if ($action == 'upload' && confirm_sesskey()) {
                         $fs->create_file_from_pathname($filerecord, $tmpfile);
                         $imported++;
                     } else {
-                        $errors[] = get_string('personalfile_usernotenrolled', 'questionnaire', $idnumber);
+                        $errors[] = get_string('personalfile_usernotenrolled', 'questionnaire', $lastname);
                     }
                 } else {
-                    $errors[] = get_string('personalfile_usernotfound', 'questionnaire', $idnumber);
+                    $errors[] = get_string('personalfile_usernotfound', 'questionnaire', $lastname);
                 }
             }
         }
@@ -192,7 +192,7 @@ echo html_writer::empty_tag('hr');
 // Display existing files.
 echo html_writer::tag('h3', get_string('personalfile_existing', 'questionnaire'));
 
-$files = $DB->get_records('questionnaire_personal_file', ['questionnaireid' => $questionnaire->id], 'idnumber');
+$files = $DB->get_records('questionnaire_personal_file', ['questionnaireid' => $questionnaire->id], 'lastname');
 
 if (empty($files)) {
     echo html_writer::tag('p', get_string('personalfile_nofiles', 'questionnaire'));
@@ -200,7 +200,7 @@ if (empty($files)) {
     echo html_writer::start_tag('table', ['class' => 'generaltable']);
     echo html_writer::start_tag('thead');
     echo html_writer::start_tag('tr');
-    echo html_writer::tag('th', get_string('idnumber'));
+    echo html_writer::tag('th', get_string('lastname'));
     echo html_writer::tag('th', get_string('fullname'));
     echo html_writer::tag('th', get_string('filename', 'questionnaire'));
     echo html_writer::tag('th', get_string('timeuploaded', 'questionnaire'));
@@ -213,7 +213,7 @@ if (empty($files)) {
         $user = $DB->get_record('user', ['id' => $file->userid]);
         
         echo html_writer::start_tag('tr');
-        echo html_writer::tag('td', $file->idnumber);
+        echo html_writer::tag('td', $file->lastname);
         echo html_writer::tag('td', fullname($user));
         echo html_writer::tag('td', $file->filename);
         echo html_writer::tag('td', userdate($file->timemodified));
